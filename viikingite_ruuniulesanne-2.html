@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viikingite Ruuniülesanne</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a0f00;
+    --parchment: #f5e6c8;
+    --parchment-dark: #e8d5a8;
+    --parchment-deep: #d4b87a;
+    --rust: #8b2500;
+    --rust-light: #c44a1a;
+    --gold: #c9922a;
+    --gold-light: #e8b94a;
+    --wood: #5c3317;
+    --wood-light: #7a4a2a;
+    --stone: #6b6355;
+    --correct: #2d5a1e;
+    --wrong: #7a1a1a;
+    --fog: rgba(245,230,200,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ink);
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Taust – puidukiud */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      repeating-linear-gradient(170deg, transparent 0px, transparent 18px, rgba(92,51,23,0.08) 18px, rgba(92,51,23,0.08) 19px),
+      repeating-linear-gradient(10deg, transparent 0px, transparent 35px, rgba(26,15,0,0.12) 35px, rgba(26,15,0,0.12) 36px),
+      radial-gradient(ellipse at 20% 50%, #2a1400 0%, #0d0700 100%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ─── PÄIS ─── */
+  .masthead {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .masthead .keel {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    border: 1px solid var(--gold);
+    padding: 4px 16px;
+    margin-bottom: 14px;
+    opacity: 0.8;
+  }
+
+  .masthead h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 900;
+    color: var(--parchment);
+    line-height: 1.1;
+    text-shadow: 0 2px 20px rgba(201,146,42,0.4), 0 0 60px rgba(201,146,42,0.15);
+    letter-spacing: 2px;
+  }
+
+  .masthead .rune-deco {
+    font-size: 26px;
+    color: var(--gold);
+    display: block;
+    margin: 10px 0 6px;
+    letter-spacing: 14px;
+    opacity: 0.7;
+    text-shadow: 0 0 20px var(--gold);
+  }
+
+  .masthead .subtitle {
+    color: var(--parchment-deep);
+    font-size: 15px;
+    font-style: italic;
+    opacity: 0.75;
+  }
+
+  .divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--rust), var(--gold), transparent);
+    margin: 28px 0;
+    position: relative;
+  }
+  .divider::before {
+    content: '⚔';
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--ink);
+    padding: 0 12px;
+    color: var(--gold);
+    font-size: 18px;
+    line-height: 2px;
+  }
+
+  /* ─── PABER-KAARDID ─── */
+  .card {
+    background: linear-gradient(160deg, var(--parchment) 0%, var(--parchment-dark) 60%, #dcc98e 100%);
+    border: 2px solid var(--parchment-deep);
+    border-radius: 2px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative;
+    box-shadow:
+      inset 0 0 40px rgba(139,90,43,0.12),
+      0 8px 40px rgba(0,0,0,0.6),
+      0 2px 8px rgba(0,0,0,0.4);
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute; inset: 4px;
+    border: 1px solid rgba(139,90,43,0.2);
+    pointer-events: none;
+  }
+
+  /* Nurgakaunistused */
+  .card::after {
+    content: '✦';
+    position: absolute; top: 10px; right: 14px;
+    color: var(--rust); opacity: 0.3; font-size: 12px;
+  }
+
+  .card-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--rust-light), transparent);
+    opacity: 0.4;
+  }
+
+  .card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: var(--wood);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .card p {
+    color: var(--ink);
+    font-size: 16.5px;
+    line-height: 1.75;
+  }
+
+  .card strong { color: var(--rust); }
+
+  /* Stsenaariumiboks */
+  .scenario-box {
+    background: linear-gradient(135deg, #2a1800, #1a0f00);
+    border: 1px solid var(--gold);
+    border-left: 4px solid var(--rust);
+    border-radius: 2px;
+    padding: 18px 22px;
+    margin: 20px 0 8px;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .scenario-box .scene-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .scenario-box p {
+    color: var(--parchment);
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.9;
+  }
+
+  /* ─── RUUNITABEL ─── */
+  .rune-grid-wrapper {
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .rune-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 6px;
+  }
+  .rune-cell {
+    background: linear-gradient(160deg, #3a2010, #1f0e04);
+    border: 1px solid rgba(201,146,42,0.3);
+    border-radius: 2px;
+    text-align: center;
+    padding: 8px 4px 6px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+  .rune-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201,146,42,0.25);
+    border-color: var(--gold);
+  }
+  .rune-cell .r-latin {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    display: block;
+    opacity: 0.8;
+    margin-bottom: 4px;
+  }
+  .rune-cell .r-rune {
+    font-size: 22px;
+    color: var(--parchment);
+    display: block;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(245,230,200,0.4);
+  }
+
+  /* ─── ÜLESANDENUMBER ─── */
+  .task-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: var(--rust);
+    border-radius: 50%;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--parchment);
+    margin-right: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .task-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .task-header-text { flex: 1; }
+  .task-header-text h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    color: var(--wood);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .task-header-text p {
+    font-size: 15px;
+    color: #3a2010;
+    line-height: 1.6;
+  }
+
+  /* ─── RUUNIKIRJA KAST ─── */
+  .rune-message {
+    background: linear-gradient(135deg, #1a0f00, #2a1800);
+    border: 2px solid var(--gold);
+    border-radius: 2px;
+    text-align: center;
+    padding: 22px 16px 16px;
+    margin: 16px 0;
+    position: relative;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.6), 0 4px 24px rgba(0,0,0,0.5);
+  }
+  .rune-message::before {
+    content: 'DEŠIFREERI';
+    position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+    background: #2a1800;
+    padding: 0 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+  .rune-message .rune-symbols {
+    font-size: clamp(28px, 7vw, 44px);
+    color: var(--parchment);
+    letter-spacing: 10px;
+    display: block;
+    text-shadow: 0 0 20px rgba(245,230,200,0.5);
+    margin-bottom: 8px;
+  }
+  .rune-message .hint {
+    font-size: 12px;
+    color: var(--parchment-deep);
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  /* Ruunikirja selgitustabel ülesandes */
+  .decode-map {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0 16px;
+    justify-content: center;
+  }
+  .decode-item {
+    background: #2a1800;
+    border: 1px solid rgba(201,146,42,0.25);
+    border-radius: 2px;
+    padding: 8px 12px;
+    text-align: center;
+    min-width: 52px;
+  }
+  .decode-item .di-rune {
+    font-size: 24px;
+    color: var(--parchment);
+    display: block;
+    line-height: 1.1;
+  }
+  .decode-item .di-arrow { color: var(--gold); font-size: 12px; margin: 2px 0; display: block; }
+  .decode-item .di-input {
+    width: 36px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 0;
+  }
+
+  /* ─── VALIKVASTUSED ─── */
+  .options-grid {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .opt-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: linear-gradient(135deg, #f0e0c0, #e4d0a0);
+    border: 1px solid rgba(139,90,43,0.3);
+    border-radius: 2px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .opt-label:hover { border-color: var(--rust-light); background: linear-gradient(135deg, #f5e8cc, #ead8b0); }
+  .opt-label input[type=checkbox] { display: none; }
+  .opt-label .opt-box {
+    width: 22px; height: 22px;
+    border: 2px solid var(--stone);
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--correct);
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .opt-label input:checked ~ .opt-box { background: var(--wood); border-color: var(--wood); color: var(--gold); }
+  .opt-label .opt-text { font-size: 15.5px; color: var(--ink); line-height: 1.5; }
+  .opt-label .opt-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--rust);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  .opt-label.revealed-correct { background: linear-gradient(135deg, #d4edda, #b8dbc2); border-color: var(--correct); }
+  .opt-label.revealed-wrong { background: linear-gradient(135deg, #f8d7d7, #e8b8b8); border-color: var(--wrong); }
+
+  /* ─── NIMI SISEND ─── */
+  .name-input-area {
+    margin: 14px 0;
+  }
+  .name-input {
+    width: 100%;
+    background: linear-gradient(135deg, #1a0f00, #2a1800);
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    padding: 14px 18px;
+    font-size: 28px;
+    color: var(--gold-light);
+    letter-spacing: 12px;
+    text-align: center;
+    outline: none;
+    font-family: Georgia, serif;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .name-input:focus {
+    border-color: var(--gold-light);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 0 20px rgba(201,146,42,0.2);
+  }
+  .name-input::placeholder { color: rgba(201,146,42,0.3); letter-spacing: 4px; font-size: 14px; }
+
+  .name-latin-preview {
+    text-align: center;
+    margin-top: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--parchment-deep);
+    opacity: 0.7;
+    min-height: 20px;
+  }
+
+  /* Ruuniklaviatuur */
+  .rune-keyboard {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 12px 0;
+    padding: 14px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(201,146,42,0.15);
+    border-radius: 2px;
+  }
+  .rune-key {
+    background: linear-gradient(160deg, #3a2010, #1f0e04);
+    border: 1px solid rgba(201,146,42,0.25);
+    border-radius: 2px;
+    padding: 6px 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    min-width: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--parchment);
+  }
+  .rune-key:hover { background: linear-gradient(160deg, #5a3520, #3a1e0a); border-color: var(--gold); transform: translateY(-1px); }
+  .rune-key:active { transform: translateY(0); }
+  .rune-key .k-rune { font-size: 18px; line-height: 1; }
+  .rune-key .k-lat { font-size: 9px; font-family: 'Cinzel', serif; letter-spacing: 1px; color: var(--gold); opacity: 0.7; }
+
+  /* ─── NUPUD ─── */
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 28px;
+    border: 2px solid;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--rust);
+    border-color: var(--rust-light);
+    color: var(--parchment);
+    box-shadow: 0 4px 16px rgba(139,37,0,0.4);
+  }
+  .btn-primary:hover { background: var(--rust-light); box-shadow: 0 6px 24px rgba(196,74,26,0.5); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    border-color: var(--stone);
+    color: var(--stone);
+  }
+  .btn-secondary:hover { border-color: var(--parchment); color: var(--parchment); }
+
+  /* ─── TAGASISIDE ─── */
+  .feedback {
+    display: none;
+    padding: 16px 20px;
+    border-radius: 2px;
+    margin-top: 14px;
+    font-size: 15.5px;
+    line-height: 1.6;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback.correct {
+    display: block;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border: 1px solid #4a8f5a;
+    border-left: 4px solid var(--correct);
+    color: #1a3a20;
+  }
+  .feedback.partial {
+    display: block;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa0);
+    border: 1px solid #c9922a;
+    border-left: 4px solid var(--gold);
+    color: #5a3a00;
+  }
+  .feedback.wrong {
+    display: block;
+    background: linear-gradient(135deg, #f8d7d7, #f5c0c0);
+    border: 1px solid #c04040;
+    border-left: 4px solid var(--wrong);
+    color: #4a1010;
+  }
+
+  /* ─── TULEMUS ─── */
+  .score-banner {
+    display: none;
+    text-align: center;
+    padding: 36px 24px;
+    margin-top: 24px;
+    background: linear-gradient(160deg, #1a0f00, #2a1800);
+    border: 2px solid var(--gold);
+    border-radius: 2px;
+    animation: fadeUp 0.6s ease both;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6), inset 0 0 60px rgba(201,146,42,0.05);
+  }
+  .score-banner.show { display: block; }
+  .score-banner .score-rune { font-size: 52px; color: var(--gold); display: block; margin-bottom: 10px; text-shadow: 0 0 30px rgba(201,146,42,0.6); }
+  .score-banner h2 { font-family: 'Cinzel', serif; font-size: 26px; color: var(--parchment); margin-bottom: 8px; }
+  .score-banner .score-pts { font-family: 'Cinzel', serif; font-size: 48px; color: var(--gold); font-weight: 900; display: block; margin: 12px 0; text-shadow: 0 0 20px rgba(201,146,42,0.4); }
+  .score-banner p { color: var(--parchment-dark); font-size: 16px; line-height: 1.7; }
+
+  /* Eduribad */
+  .progress-bar {
+    background: rgba(0,0,0,0.3);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 6px 0 16px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rust), var(--gold));
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  /* ─── ANIMATSIOONID ─── */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+  @keyframes shimmer  { 0%,100%{opacity:0.6} 50%{opacity:1} }
+
+  .card:nth-child(1) { animation-delay: 0.1s; }
+  .card:nth-child(2) { animation-delay: 0.2s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+  .card:nth-child(4) { animation-delay: 0.4s; }
+  .card:nth-child(5) { animation-delay: 0.5s; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+  @media(max-width:520px) {
+    .card { padding: 20px 18px; }
+    .rune-symbols { letter-spacing: 5px !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- PÄIS -->
+  <div class="masthead">
+    <span class="keel">7. klass · Ajalugu · Varakeskaeg</span>
+    <h1>Viikingite Ruuniülesanne</h1>
+    <span class="rune-deco">ᚢ ᛁ ᛁ ᚲ</span>
+    <p class="subtitle">Thinkling VR-keskkond · Kinnistav ülesanne · 1 punkt</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TAUSTTEKST -->
+  <div class="card">
+    <div class="card-label">📜 Tausttekst</div>
+    <div class="scenario-box">
+      <span class="scene-tag">⚔ VR-STSENAARIUM</span>
+      <p>Oled viikingite laeva tekil. Kapten ulatab sulle puutüki, millele on raiutud salapärane sõnum. "Dešifreeri see," ütleb ta. Kasuta abivahendina allpool olevat ruunilauda.</p>
+    </div>
+    <p style="margin-top:16px;"><strong>Viikingid</strong> (u 800–1050 pKr) olid Skandinaaviast pärit meresõitjad, kellel oli oma tähestik – <strong>ruunikiri ehk futhark</strong>. Ruune raiuti kivist, puidust ja luust esemetesse. Igale ladina tähele vastab üks ruunimärk.</p>
+  </div>
+
+  <!-- RUUNILAUD -->
+  <div class="card">
+    <div class="card-label">🗡 Abivahend – Ruunilaud</div>
+    <p style="margin-bottom:14px;font-size:14px;color:#5a3a20;font-style:italic;">Leia iga tähe juurest vastav ruunimärk. Kasuta lauda ülesannete lahendamiseks.</p>
+    <div class="rune-grid" id="runeGridRef"></div>
+  </div>
+
+  <!-- ÜLESANNE 1 -->
+  <div class="card">
+    <div class="task-header">
+      <span class="task-num">1</span>
+      <div class="task-header-text">
+        <h3>Dešifreeri ruunikirjas sõnum</h3>
+        <p>Tõlgi allolev ruunikirjas sõna ladina tähtedesse, kasutades ruunilauda. Sisesta iga täht eraldi kasti.</p>
+      </div>
+    </div>
+
+    <div class="rune-message">
+      <span class="rune-symbols">ᚢ ᛁ ᛁ ᚲ ᛁ ᚾ ᚷ ᛁ ᛞ</span>
+      <span class="hint">9 ruuni · ladina tähtedesse</span>
+    </div>
+
+    <div class="decode-map" id="decodeMap"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="check1()">⚔ Kontrolli vastust</button>
+      <button class="btn btn-secondary" onclick="reset1()">↺ Alusta uuesti</button>
+    </div>
+    <div class="feedback" id="fb1"></div>
+  </div>
+
+  <!-- ÜLESANNE 2 -->
+  <div class="card">
+    <div class="task-header">
+      <span class="task-num">2</span>
+      <div class="task-header-text">
+        <h3>Milleks kasutasid viikingid ruunikirja?</h3>
+        <p>Vali kõik õiged vastused (mitu vastust võib olla õige).</p>
+      </div>
+    </div>
+
+    <div class="options-grid">
+      <label class="opt-label" id="opt_a">
+        <input type="checkbox" id="cb_a">
+        <span class="opt-box" id="box_a"></span>
+        <span class="opt-text"><span class="opt-letter">A)</span> Hauakividele teksti raiuma</span>
+      </label>
+      <label class="opt-label" id="opt_b">
+        <input type="checkbox" id="cb_b">
+        <span class="opt-box" id="box_b"></span>
+        <span class="opt-text"><span class="opt-letter">B)</span> Mobiiltelefonide programmeerimiseks</span>
+      </label>
+      <label class="opt-label" id="opt_c">
+        <input type="checkbox" id="cb_c">
+        <span class="opt-box" id="box_c"></span>
+        <span class="opt-text"><span class="opt-letter">C)</span> Relvadele ja esemetele nimede või sümbolite raiuma</span>
+      </label>
+      <label class="opt-label" id="opt_d">
+        <input type="checkbox" id="cb_d">
+        <span class="opt-box" id="box_d"></span>
+        <span class="opt-text"><span class="opt-letter">D)</span> Maagiliste võimete usuga seotud kirjadeks</span>
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="check2()">⚔ Kontrolli vastust</button>
+      <button class="btn btn-secondary" onclick="reset2()">↺ Alusta uuesti</button>
+    </div>
+    <div class="feedback" id="fb2"></div>
+  </div>
+
+  <!-- ÜLESANNE 3 -->
+  <div class="card">
+    <div class="task-header">
+      <span class="task-num">3</span>
+      <div class="task-header-text">
+        <h3>Kirjuta oma nimi ruunikirjas</h3>
+        <p>Kasuta allpool olevat ruuniklaviatuuri ja kirjuta oma nimi ruunidena. Kiri kuvatakse automaatselt.</p>
+      </div>
+    </div>
+
+    <div class="name-input-area">
+      <input class="name-input" id="runeNameInput" placeholder="vajuta klaviatuuri all..." readonly>
+      <div class="name-latin-preview" id="nameLatin">— sinu nimi ladina tähtedes —</div>
+    </div>
+
+    <div class="rune-keyboard" id="runeKeyboard"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="clearName()">↺ Kustuta</button>
+      <button class="btn btn-primary" onclick="check3()">⚔ Kinnita nimi</button>
+    </div>
+    <div class="feedback" id="fb3"></div>
+  </div>
+
+  <!-- TULEMUS -->
+  <div class="score-banner" id="scoreBanner">
+    <span class="score-rune">ᚢ ᛁ ᛁ ᚲ</span>
+    <h2>Ülesanne lõpetatud!</h2>
+    <span class="score-pts" id="scoreDisplay">0/1</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <p id="scoreMsg"></p>
+  </div>
+
+</div>
+
+<script>
+// ─── ANDMED ───────────────────────────────────────────────────────────────────
+const RUNES = [
+  {l:'A', r:'ᚨ'},{l:'B', r:'ᛒ'},{l:'C', r:'ᚲ'},{l:'D', r:'ᛞ'},
+  {l:'E', r:'ᛖ'},{l:'F', r:'ᚠ'},{l:'G', r:'ᚷ'},{l:'H', r:'ᚺ'},
+  {l:'I', r:'ᛁ'},{l:'J', r:'ᛃ'},{l:'K', r:'ᚲ'},{l:'L', r:'ᛚ'},
+  {l:'M', r:'ᛗ'},{l:'N', r:'ᚾ'},{l:'O', r:'ᛟ'},{l:'P', r:'ᛈ'},
+  {l:'Q', r:'ᚲ'},{l:'R', r:'ᚱ'},{l:'S', r:'ᛋ'},{l:'T', r:'ᛏ'},
+  {l:'U', r:'ᚢ'},{l:'V', r:'ᚢ'},{l:'W', r:'ᚢ'},{l:'X', r:'ᚲ'},
+  {l:'Y', r:'ᛃ'},{l:'Z', r:'ᛉ'}
+];
+
+// Ruunilaual olev täpne loend (pildil olev)
+const RUNE_TABLE = {
+  A:'ᚨ', B:'ᛒ', C:'ᚲ', D:'ᛞ', E:'ᛖ', F:'ᚠ', G:'ᚷ', H:'ᚺ',
+  I:'ᛁ', J:'ᛃ', K:'ᚲ', L:'ᛚ', M:'ᛗ', N:'ᚾ', O:'ᛟ', P:'ᛈ',
+  Q:'◇', R:'ᚱ', S:'ᛋ', T:'ᛏ', U:'ᚢ', V:'ᚢ', W:'ᚢ', X:'ᚲ',
+  Y:'ᛃ', Z:'ᛉ'
+};
+
+// Ülesanne 1: ruunid vastavad tähtedele VIIKINGIT
+const MESSAGE_RUNES = ['ᚢ','ᛁ','ᛁ','ᚲ','ᛁ','ᚾ','ᚷ','ᛁ','ᛞ'];
+const MESSAGE_ANSWER = 'VIIKINGID';
+
+let nameBuffer = '';
+let scores = [null, null, null]; // null=lahendamata, true=õige, false=vale
+
+// ─── INITSIALISEERIMINE ────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  buildRuneGrid();
+  buildDecodeMap();
+  buildKeyboard();
+  syncCheckboxes();
+});
+
+function buildRuneGrid() {
+  const grid = document.getElementById('runeGridRef');
+  RUNE_TABLE && Object.entries(RUNE_TABLE).forEach(([lat, run]) => {
+    const cell = document.createElement('div');
+    cell.className = 'rune-cell';
+    cell.innerHTML = `<span class="r-latin">${lat}</span><span class="r-rune">${run}</span>`;
+    grid.appendChild(cell);
+  });
+}
+
+function buildDecodeMap() {
+  const map = document.getElementById('decodeMap');
+  MESSAGE_RUNES.forEach((rune, i) => {
+    const item = document.createElement('div');
+    item.className = 'decode-item';
+    item.innerHTML = `
+      <span class="di-rune">${rune}</span>
+      <span class="di-arrow">↓</span>
+      <input class="di-input" id="di_${i}" maxlength="1" placeholder="?" autocomplete="off">
+    `;
+    map.appendChild(item);
+    const inp = item.querySelector(`#di_${i}`);
+    inp.addEventListener('input', e => {
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g,'');
+      if (e.target.value && i < MESSAGE_RUNES.length - 1) {
+        const next = document.getElementById(`di_${i+1}`);
+        if (next) next.focus();
+      }
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value && i > 0) {
+        document.getElementById(`di_${i-1}`)?.focus();
+      }
+    });
+  });
+}
+
+function buildKeyboard() {
+  const kb = document.getElementById('runeKeyboard');
+  Object.entries(RUNE_TABLE).forEach(([lat, rune]) => {
+    const btn = document.createElement('button');
+    btn.className = 'rune-key';
+    btn.innerHTML = `<span class="k-rune">${rune}</span><span class="k-lat">${lat}</span>`;
+    btn.addEventListener('click', () => addRune(lat, rune));
+    kb.appendChild(btn);
+  });
+}
+
+function syncCheckboxes() {
+  ['a','b','c','d'].forEach(id => {
+    document.getElementById(`cb_${id}`).addEventListener('change', function() {
+      document.getElementById(`box_${id}`).textContent = this.checked ? '✓' : '';
+    });
+  });
+}
+
+// ─── ÜLESANNE 1 ───────────────────────────────────────────────────────────────
+function check1() {
+  let ans = '';
+  for (let i = 0; i < MESSAGE_RUNES.length; i++) {
+    const v = document.getElementById(`di_${i}`)?.value?.toUpperCase() || '';
+    ans += v;
+  }
+  const fb = document.getElementById('fb1');
+  if (ans === MESSAGE_ANSWER) {
+    fb.className = 'feedback correct';
+    fb.innerHTML = '✅ <strong>Suurepärane!</strong> Õige – sõnum on <strong>VIIKINGID</strong>! Sa oled tõeline ruunimõistja.';
+    scores[0] = true;
+  } else if (ans.length < MESSAGE_ANSWER.length) {
+    fb.className = 'feedback partial';
+    fb.innerHTML = '⚠️ Kõik lahtrid pole täidetud. Täida iga ruuni jaoks üks täht.';
+    return;
+  } else {
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `❌ Viga! Sa kirjutasid: <strong>${ans}</strong>. Vaata ruunilauda hoolikamalt. Näpunäide: esimene täht on <strong>V</strong>, viimane <strong>D</strong>.`;
+    scores[0] = false;
+  }
+  updateScore();
+}
+
+function reset1() {
+  for (let i = 0; i < MESSAGE_RUNES.length; i++) {
+    const el = document.getElementById(`di_${i}`);
+    if (el) el.value = '';
+  }
+  document.getElementById('fb1').className = 'feedback';
+  scores[0] = null;
+  updateScore();
+}
+
+// ─── ÜLESANNE 2 ───────────────────────────────────────────────────────────────
+function check2() {
+  const correct = ['a','c','d'];
+  const checked = ['a','b','c','d'].filter(id => document.getElementById(`cb_${id}`).checked);
+  const fb = document.getElementById('fb2');
+
+  // Reveal
+  ['a','b','c','d'].forEach(id => {
+    const opt = document.getElementById(`opt_${id}`);
+    opt.classList.remove('revealed-correct','revealed-wrong');
+    if (correct.includes(id) && checked.includes(id)) opt.classList.add('revealed-correct');
+    else if (!correct.includes(id) && checked.includes(id)) opt.classList.add('revealed-wrong');
+    else if (correct.includes(id) && !checked.includes(id)) opt.classList.add('revealed-correct');
+  });
+
+  const missed = correct.filter(id => !checked.includes(id));
+  const wrong = checked.filter(id => !correct.includes(id));
+
+  if (wrong.length === 0 && missed.length === 0) {
+    fb.className = 'feedback correct';
+    fb.innerHTML = '✅ <strong>Täiuslik!</strong> Kõik kolm õiget vastust on märgitud: hauakivid (A), relvad (C) ja maagia (D). Väga hästi!';
+    scores[1] = true;
+  } else if (wrong.length === 0 && missed.length <= 1 && checked.length >= 2) {
+    fb.className = 'feedback partial';
+    fb.innerHTML = '👍 <strong>Peaaegu õige!</strong> Sa leidsid enamiku õigetest vastustest. Õiged vastused on <strong>A, C ja D</strong>. B (mobiiltelefonid) oli vale – viikingid elasid aastal 800–1050!';
+    scores[1] = true;
+  } else {
+    fb.className = 'feedback wrong';
+    const wrongLabels = wrong.map(id => id.toUpperCase()).join(', ');
+    fb.innerHTML = `❌ Veel proovida. ${wrongLabels ? `Vale valik: <strong>${wrongLabels}</strong>. ` : ''}Õiged vastused on <strong>A, C ja D</strong> – hauakivid, relvad ja maagia. B oli väär (mobiiltelefonid ei eksisteeri viikingite ajal!).`;
+    scores[1] = false;
+  }
+  updateScore();
+}
+
+function reset2() {
+  ['a','b','c','d'].forEach(id => {
+    document.getElementById(`cb_${id}`).checked = false;
+    document.getElementById(`box_${id}`).textContent = '';
+    document.getElementById(`opt_${id}`).classList.remove('revealed-correct','revealed-wrong');
+  });
+  document.getElementById('fb2').className = 'feedback';
+  scores[1] = null;
+  updateScore();
+}
+
+// ─── ÜLESANNE 3 ───────────────────────────────────────────────────────────────
+function addRune(lat, rune) {
+  if (nameBuffer.length >= 16) return;
+  nameBuffer += rune;
+  const latinBuf = nameBuffer; // for display we collect as typed
+  document.getElementById('runeNameInput').value = nameBuffer;
+  updateNamePreview(lat);
+}
+
+let nameLatin = '';
+function updateNamePreview(lat) {
+  if (!lat) return;
+  nameLatin += lat;
+  document.getElementById('nameLatin').textContent = nameLatin || '— sinu nimi ladina tähtedes —';
+}
+
+function clearName() {
+  nameBuffer = '';
+  nameLatin = '';
+  document.getElementById('runeNameInput').value = '';
+  document.getElementById('nameLatin').textContent = '— sinu nimi ladina tähtedes —';
+  document.getElementById('fb3').className = 'feedback';
+  scores[2] = null;
+  updateScore();
+}
+
+function check3() {
+  const fb = document.getElementById('fb3');
+  if (!nameBuffer || nameBuffer.length < 2) {
+    fb.className = 'feedback wrong';
+    fb.innerHTML = '⚠️ Sisesta oma nimi – vähemalt 2 tähemärki!';
+    return;
+  }
+  fb.className = 'feedback correct';
+  fb.innerHTML = `✅ <strong>Suurepärane!</strong> Sa kirjutasid oma nime ruunikirjas: <strong style="font-size:22px;letter-spacing:6px;">${nameBuffer}</strong><br><small style="opacity:0.7">Nüüd on ka sinu nimi viikingite keeles jäädvustatud!</small>`;
+  scores[2] = true;
+  updateScore();
+}
+
+// ─── TULEMUSED ────────────────────────────────────────────────────────────────
+function updateScore() {
+  if (scores.every(s => s !== null)) {
+    const correct = scores.filter(Boolean).length;
+    const total = 3;
+    const banner = document.getElementById('scoreBanner');
+    banner.classList.add('show');
+    document.getElementById('scoreDisplay').textContent = `${correct}/${total}`;
+    document.getElementById('progressFill').style.width = `${(correct/total)*100}%`;
+
+    let msg = '';
+    if (correct === 3) {
+      msg = '🏆 Suurepärane tulemus! Sa oled tõeline viikingite ekspert. <strong>1 punkt</strong> on sinu!';
+    } else if (correct >= 2) {
+      msg = '👍 Väga hea töö! Sa tunned viikingite kultuuri. <strong>1 punkt</strong> on sinu!';
+    } else {
+      msg = '📚 Hea proovitus! Vaata ruunilauda uuesti ja proovi veel kord.';
+    }
+    document.getElementById('scoreMsg').innerHTML = msg;
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+</script>
+</body>
+</html>
